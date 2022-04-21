@@ -25,3 +25,61 @@ Main entrypoint of this bot
         2. bot status check
         3. bot self-check && self-heal
 '''
+
+import argparse, yaml
+from asyncio import events
+import telethon
+import asyncio
+from handlers.chat_action import ChatAction
+from handlers.query_callback import AnswerAction
+from models.bot import AuthBot
+
+from models.config import Config
+from models.logger import BotLogger
+
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-c", "--config", default="./config.yaml", help="where the config file stored")
+
+args = parser.parse_args()
+
+async def main():
+    # Read the config file
+    print(f"Reading configuration from {args.config}")
+    with open(args.config, "r", encoding="utf-8") as f:
+        config_dict = yaml.load(f, yaml.FullLoader)
+    config = Config()
+    config.update_config(config_dict=config_dict)
+
+    # Setup logger
+    logger = BotLogger(config=config).logger
+    logger.info("Logger initiated successfully!")
+
+    # Setup the bot
+    logger.info("Initiating the bot...")
+    bot = AuthBot(config=config).bot
+    logger.info("Bot initiated successfully!")
+
+    #  Add handlers
+    logger.info("Adding handlers for the bot...")
+
+    chat_action = ChatAction(config=config, bot=bot, logger=logger)
+    answer_action = AnswerAction(config=config, bot=bot, logger=logger)
+
+    bot.add_event_handler(chat_action.handle, event=telethon.events.ChatAction(chats=config.chat))
+    bot.add_event_handler(answer_action.handle, event=telethon.events.CallbackQuery())
+
+    logger.info("Handlers added successfully!")
+
+    # Fireup the bot
+    await bot.start(bot_token=config.bot["bot_token"])
+    
+    logger.info("Everything fired up successfully now!")
+
+    # Run forever
+    await bot.run_until_disconnected()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
