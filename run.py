@@ -67,8 +67,8 @@ async def main():
     chat_action = ChatAction(config=config, bot=bot, logger=logger)
     answer_action = AnswerAction(config=config, bot=bot, logger=logger)
 
-    bot.add_event_handler(chat_action.handle, event=telethon.events.ChatAction(chats=config.chat))
-    bot.add_event_handler(answer_action.handle, event=telethon.events.CallbackQuery())
+    bot.add_event_handler(chat_action, event=telethon.events.ChatAction(chats=config.chat))
+    bot.add_event_handler(answer_action, event=telethon.events.CallbackQuery())
 
     logger.info("Handlers added successfully!")
 

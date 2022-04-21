@@ -23,7 +23,7 @@ class ChatAction():
         self.bot = bot
         self.logger = logger
 
-    async def handle(self, event):
+    async def __call__(self, event):
         if event.user_joined:
             self.logger.info(f"New user {event.user.username} entered.")
 

@@ -19,7 +19,7 @@ class AnswerAction():
         self.bot = bot
         self.logger = logger
 
-    async def handle(self, event):
+    async def __call__(self, event):
         if event.data.decode() == self.config.auth["answers"][f"t.me/{event.chat.username}"]:
             # pass the exam
             msg = await event.get_message()
