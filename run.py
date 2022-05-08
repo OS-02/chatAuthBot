@@ -31,6 +31,7 @@ from asyncio import events
 import telethon
 import asyncio
 from handlers.chat_action import ChatAction
+from handlers.new_message import NewMessage
 from handlers.query_callback import AnswerAction
 from models.bot import AuthBot
 
@@ -66,9 +67,11 @@ async def main():
 
     chat_action = ChatAction(config=config, bot=bot, logger=logger)
     answer_action = AnswerAction(config=config, bot=bot, logger=logger)
+    new_message = NewMessage(config=config, bot=bot, logger=logger)
 
     bot.add_event_handler(chat_action, event=telethon.events.ChatAction(chats=config.chat))
     bot.add_event_handler(answer_action, event=telethon.events.CallbackQuery())
+    bot.add_event_handler(new_message, event=telethon.events.NewMessage(chats=config.chat, pattern=r"/check@chaos_auth_bot"))
 
     logger.info("Handlers added successfully!")
 
@@ -76,6 +79,9 @@ async def main():
     await bot.start(bot_token=config.bot["bot_token"])
     
     logger.info("Everything fired up successfully now!")
+
+    # alerting all groups whcich is being managed
+    [await bot.send_message(entity=chat, message=f"📹 Chaos-Auth-Bot is watching...") for chat in config.chat]
 
     # Run forever
     await bot.run_until_disconnected()

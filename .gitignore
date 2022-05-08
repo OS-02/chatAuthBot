@@ -3,3 +3,6 @@ config.yaml
 venv/
 */__pycache__
 log/*
+.dockerignore
+bot.session
+

@@ -34,7 +34,7 @@ class AnswerAction():
             await event.delete()
         else:
             # donot pass, remove him/her immediately
-            await self.bot.kick_participant(entity=event.chat, user=event.user)
+            await self.bot.kick_participant(entity=event.chat, user=user)
             await self.bot.send_message(entity=event.chat, message=f"@{user} has been kicked out!")
             self.logger.info(f"New user @{event.user.username} kicked!")
             await event.delete()
